@@ -1,15 +1,9 @@
 # Mafia Intensity and Sector Productivity in Italian Provinces
 
-Replication package for a master's thesis on organised crime and labour productivity.
+Replication package for a bachelor's thesis on organised crime and labour productivity.
 It builds a province-level index of mafia intensity from Italian administrative data,
 then estimates how sector labour productivity varies with that index across
 106 provinces and 11 sectors.
-
-The motivating puzzle: organised crime is consistently found to depress regional
-productivity *in aggregate*, but that average hides considerable variation across
-sectors. Some sectors plausibly benefit from criminal presence — real estate above
-all, the classic laundering channel. These models separate the overall cross-province
-level effect from the sector-specific gradients.
 
 ## Data
 
@@ -21,20 +15,17 @@ level effect from the sector-specific gradients.
 | ISTAT | Resident population estimates | 2002–2019 |
 | ANBSC | Confiscated firms and real estate under administration | cumulative |
 
-ANBSC is the Italian agency administering assets seized from organised crime.
-Sud Sardegna is folded into Cagliari throughout, since it has no separate crime
-data from before its 2016 boundary change; that leaves 106 provinces.
-
-ISTAT's CSV exports quote fields with single quotes while several province names
-(L'Aquila, Valle d'Aosta, Reggio nell'Emilia) contain apostrophes of their own.
-The read helpers in `mafia index.R` and `target indicators.R` repair this before parsing.
+ANBSC (Agenzia Nazionale
+per l'amministrazione e la destinazione dei beni
+sequestrati e confiscati alla criminalità organizzata) is the Italian agency administering assets seized from organised crime.
+ISTAT (Istituto Nazionale di Statistica) is the Italian Statistics Agency.
 
 ## The mafia index
 
-Fifteen components: thirteen ISTAT crime rates plus two ANBSC confiscation
+Fifteen measures pooled into a single composite index; thirteen ISTAT crime rates plus two ANBSC confiscation
 measures expressed per thousand inhabitants. Each is `log1p`-transformed, min–max
-normalised to [0, 1], then combined as a weighted row sum. Weights rise with how
-specifically an indicator signals mafia activity, and the two laundering-linked
+normalised to [0, 1], then combined as a weighted row sum. Weights set based on how
+closely related an indicator is to mafia activity, and the two laundering-linked
 measures are weighted up deliberately:
 
 | Weight | Components |
@@ -61,36 +52,6 @@ by province. Productivity is log value added per worker.
 | `m_macro` | sector × index, macro-area × year FE | gradients net of the North–South divide |
 | `m_northsouth` | sector × index, North/South + year + industry FE | the same, with a coarse two-region dummy |
 
-The absolute and fixed-effects columns have to be read together:
-`fe_slope = abs_slope − abs_slope(Manufacturing)` holds by construction, so the FE
-estimates are differences against a sector that is itself strongly negative.
-
-## Results
-
-Productivity differential per one standard deviation of the mafia index (%):
-
-| Sector | Absolute | Relative to Manufacturing |
-| --- | --- | --- |
-| Agriculture | −17.3 | −7.2 |
-| Manufacturing | −10.9 | 0.0 |
-| Finance/admin | −7.6 | +3.8 |
-| Mining/utilities/waste | −6.9 | +4.5 |
-| Professional/admin | −5.5 | +6.1 |
-| Construction | −4.7 | +6.9 |
-| Trade/transport/hospitality | −4.0 | +7.7 |
-| Arts/other services | −2.3 | +9.7 |
-| Public admin/health/edu | +1.2 | +13.6 |
-| Com/Info | +1.7 | +14.2 |
-| Real estate | +14.5 | +28.5 |
-
-The absolute gradient is negative in eight of eleven sectors and steepest in
-Agriculture and Manufacturing. Real estate is the clear outlier in the other
-direction. That said, the residual map in `mafia_maps.R` suggests the real-estate
-gap tracks the North–South manufacturing gradient more than it isolates a clean
-laundering signal — which is what `m_macro` and `m_northsouth` are there to probe.
-
-Full estimates: `Thesis/Data/output/absolute_vs_fe_effects.csv`, with LaTeX
-versions of the regression tables in the same directory.
 
 ## Layout
 
@@ -109,9 +70,9 @@ Thesis/
     output/               every figure, table and estimate the scripts produce
 ```
 
-## Running it
+## Requirements for running
 
-R 4.1 or newer (the scripts use the native `|>` pipe), plus:
+R 4.1 or newer (the scripts use the native `|>` pipe)
 
 ```r
 install.packages(c("tidyverse", "fixest", "broom", "giscoR", "sf", "stringi"))
